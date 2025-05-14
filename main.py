@@ -57,8 +57,16 @@ if not TWILIO_ACCOUNT_SID or not TWILIO_AUTH_TOKEN or not TWILIO_PHONE_NUMBER:
 
 @app.get("/", response_class=HTMLResponse)
 async def index_page():
-    return {"message": "Twilio Media Stream Server is running!"}
-
+    html = """
+    <html>
+        <head><title>Twilio Media Stream</title></head>
+        <body>
+            <h1>✅ Twilio Media Stream Server is running!</h1>
+            <p>Use this backend for OpenAI real-time GPT-4o voice over Twilio.</p>
+        </body>
+    </html>
+    """
+    return HTMLResponse(content=html, status_code=200)
 
 @app.post("/make-call")
 async def make_call(to_phone_number: str):
