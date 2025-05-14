@@ -68,11 +68,18 @@ async def index_page():
     """
     return HTMLResponse(content=html, status_code=200)
 
+from pydantic import BaseModel
+
+class CallRequest(BaseModel):
+    to_phone_number: str
+
 @app.post("/make-call")
-async def make_call(to_phone_number: str):
+async def make_call(request: CallRequest):
     """Make an outgoing call to the specified phone number."""
+    to_phone_number = request.to_phone_number
     if not to_phone_number:
         return {"error": "Phone number is required"}
+    
     try:
         client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
         call = client.calls.create(
@@ -81,10 +88,11 @@ async def make_call(to_phone_number: str):
             from_=TWILIO_PHONE_NUMBER,
         )
         print(f"Call initiated with SID: {call.sid}")
+        return {"call_sid": call.sid}
     except Exception as e:
         print(f"Error initiating call: {e}")
+        return {"error": str(e)}
 
-    return {"call_sid": call.sid}
 
 
 @app.api_route("/outgoing-call", methods=["GET", "POST"])
